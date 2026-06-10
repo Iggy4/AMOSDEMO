@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AOMS Synapse V1</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">AOMS / Synapse V1</div>
+      <h1>Adaptive Operational Monitoring System</h1>
+    </div>
+    <div class="status-pill" id="globalStatus"><span></span> Machine 1 Online</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <h2>Machine-side visibility for manufacturing efficiency.</h2>
+        <p>Synapse V1 is a Raspberry Pi-based edge monitoring unit built to track machine state, startup consistency, cycle behavior, idle loss, vibration, temperature, and preventative maintenance signals directly on the floor.</p>
+        <button onclick="scrollToPanel()">Open Machine View</button>
+      </div>
+
+      <div class="model-card">
+        <div class="machine-model">
+          <div class="machine-body">
+            <div class="screen">M1</div>
+            <div class="spindle"></div>
+            <div class="bed"></div>
+            <div class="status-light" id="modelLight"></div>
+          </div>
+          <div class="synapse-node"><div class="node-light"></div>SYNAPSE</div>
+          <div class="data-line"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard" id="machinePanel">
+      <div class="panel-header">
+        <div>
+          <div class="eyebrow">Live Floor Node</div>
+          <h2>Machine 1</h2>
+        </div>
+        <select id="modeSelect" onchange="setMode(this.value)">
+          <option value="green">Running / Healthy</option>
+          <option value="yellow">Warning / Drift</option>
+          <option value="red">Fault / Stop</option>
+        </select>
+      </div>
+
+      <div class="grid">
+        <article class="metric"><span>Machine State</span><strong id="machineState">Running</strong><small id="stateNote">Within expected operating range</small></article>
+        <article class="metric"><span>Cycle Time</span><strong id="cycleTime">01:42</strong><small>Baseline: 01:45</small></article>
+        <article class="metric"><span>Startup Time</span><strong id="startupTime">00:38</strong><small>Baseline: 00:41</small></article>
+        <article class="metric"><span>Idle Loss</span><strong id="idleTime">00:12</strong><small>Target: under 00:20</small></article>
+        <article class="metric"><span>Vibration</span><strong id="vibration">0.24 g</strong><small>Normal: 0.18–0.30 g</small></article>
+        <article class="metric"><span>Temperature</span><strong id="temperature">71°F</strong><small>Normal: 65–82°F</small></article>
+      </div>
+
+      <div class="two-col">
+        <article class="card">
+          <h3>Instructions</h3>
+          <ol>
+            <li>Verify Machine 1 is online and showing a green state.</li>
+            <li>Confirm current job and cycle baseline.</li>
+            <li>Check alerts before startup or next cycle.</li>
+            <li>Log maintenance notes if abnormal vibration, heat, or delay appears.</li>
+          </ol>
+        </article>
+
+        <article class="card safety">
+          <h3>Safety Notices</h3>
+          <ul>
+            <li>Do not bypass machine guarding.</li>
+            <li>Lockout/tagout before maintenance.</li>
+            <li>Investigate red-state alerts before restarting.</li>
+            <li>Use Synapse data as support, not a replacement for shop safety procedure.</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="two-col">
+        <article class="card">
+          <h3>Preventative Maintenance</h3>
+          <div id="maintenance">
+            <p><b>Status:</b> No immediate maintenance issue detected.</p>
+            <p><b>Next check:</b> Spindle inspection in 18 runtime hours.</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Operational Insight</h3>
+          <div id="insight">Machine startup and cycle behavior are currently performing within baseline.</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="roadmap">
+      <h2>V1 → V2 Roadmap</h2>
+      <div class="roadmap-grid">
+        <div><b>V1</b><p>Pi-based floor monitoring, live metrics, baselines, alerts, maintenance tracking.</p></div>
+        <div><b>V2</b><p>Adaptive assistance, deeper machine-specific profiles, stronger sensor fusion.</p></div>
+        <div><b>V3</b><p>Connected factory layer linking human workflow and machine workflow into one system.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>AOMS / Synapse V1 — Local-first operational monitoring.</footer>
+  <script src="script.js"></script>
+</body>
+</html>
