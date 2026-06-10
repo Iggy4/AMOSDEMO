@@ -1,1 +1,0 @@
-Future 3D model assets go here. Suggested next step: Three.js CNC model placeholder or GLB import.
