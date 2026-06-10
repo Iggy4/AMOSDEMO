@@ -1,0 +1,252 @@
+:root {
+  --bg: #070b10;
+  --panel: #111923;
+  --panel2: #162130;
+  --line: #253346;
+  --text: #f4f7fb;
+  --muted: #91a0b4;
+  --green: #44e28b;
+  --yellow: #ffd166;
+  --red: #ff5b5b;
+  --blue: #69a7ff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #122033 0%, var(--bg) 42%);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(7, 11, 16, 0.85);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+}
+
+h1, h2, h3, p { margin: 0; }
+.topbar p, .muted, small { color: var(--muted); }
+
+.machine-online {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 12px 16px;
+  border-radius: 14px;
+}
+
+.online-dot {
+  width: 14px;
+  height: 14px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 18px var(--green);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 18px;
+  padding: 24px 32px;
+}
+
+.card, .hero-card, .metric {
+  background: linear-gradient(180deg, var(--panel2), var(--panel));
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 18px 38px rgba(0,0,0,0.25);
+}
+
+.hero-card { grid-column: span 7; min-height: 220px; }
+.model-card { grid-column: span 5; }
+.metrics-grid { grid-column: span 12; display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+.controls-card, .alerts-card, .maintenance-card { grid-column: span 4; }
+.procedures-card, .activity-card { grid-column: span 6; }
+
+.status-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.label, .tag {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: 12px;
+}
+
+.status-left h2 {
+  font-size: 58px;
+  margin: 12px 0;
+}
+
+.status-orb {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 60px var(--green);
+}
+
+.status-green .status-orb { background: var(--green); box-shadow: 0 0 60px var(--green); }
+.status-yellow .status-orb { background: var(--yellow); box-shadow: 0 0 60px var(--yellow); }
+.status-red .status-orb { background: var(--red); box-shadow: 0 0 60px var(--red); }
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.metric span { display: block; color: var(--muted); font-size: 13px; }
+.metric strong { display: block; font-size: 28px; margin: 8px 0 4px; }
+
+.button-row, .procedure-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+button {
+  background: #223148;
+  color: var(--text);
+  border: 1px solid #3a4b66;
+  padding: 11px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+button:hover { background: #304562; }
+
+.feed-list { padding-left: 18px; margin: 0; }
+.feed-list li { margin-bottom: 10px; color: #c9d3e3; }
+.feed-list.compact li { font-size: 13px; }
+
+.good { color: var(--green) !important; }
+.warn { color: var(--yellow) !important; }
+.bad { color: var(--red) !important; }
+
+.machine-visual {
+  height: 230px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0b121b;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.cnc-frame {
+  position: relative;
+  width: 260px;
+  height: 170px;
+  border: 8px solid #6c7b8e;
+  border-radius: 12px;
+  background: #263347;
+}
+
+.cnc-window {
+  position: absolute;
+  left: 20px;
+  top: 24px;
+  width: 120px;
+  height: 75px;
+  background: rgba(105, 167, 255, .25);
+  border: 3px solid #8fbaff;
+}
+
+.cnc-spindle {
+  position: absolute;
+  left: 76px;
+  top: 34px;
+  width: 18px;
+  height: 68px;
+  background: #dfe8f5;
+  animation: spindlePulse 1s infinite alternate;
+}
+
+.cnc-bed {
+  position: absolute;
+  left: 25px;
+  bottom: 25px;
+  width: 150px;
+  height: 18px;
+  background: #a3afbf;
+}
+
+.cnc-panel {
+  position: absolute;
+  right: 24px;
+  top: 28px;
+  width: 55px;
+  height: 95px;
+  border-radius: 8px;
+  background: #101722;
+  border: 2px solid #475873;
+}
+
+@keyframes spindlePulse {
+  from { transform: translateY(0); opacity: .75; }
+  to { transform: translateY(8px); opacity: 1; }
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.modal-card {
+  max-width: 620px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 28px;
+}
+
+.modal-badge {
+  display: inline-block;
+  background: rgba(255, 91, 91, .15);
+  color: var(--red);
+  border: 1px solid rgba(255, 91, 91, .4);
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+footer {
+  padding: 24px 32px;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 1000px) {
+  .hero-card, .model-card, .controls-card, .alerts-card, .maintenance-card, .procedures-card, .activity-card {
+    grid-column: span 12;
+  }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .topbar { flex-direction: column; align-items: flex-start; gap: 16px; }
+}
