@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Synapse V4.4 | Universal Floor System</title>
+<style>
+:root{
+  --bg:#070a0d;--rail:#0b1117;--paper:#f3efe4;--ink:#1f252b;--panel:#101820;--panel2:#0d141c;
+  --line:#263340;--text:#eef3f8;--muted:#8e9baa;--g:#35d07f;--y:#e7b94f;--r:#e65757;--b:#6da8ff;--p:#a78bfa;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Segoe UI,Arial,sans-serif}
+button{background:#1b2733;color:var(--text);border:1px solid #344556;border-radius:8px;padding:9px 12px;font-weight:700;cursor:pointer}
+button:hover{background:#263746}
+h1,h2,h3,h4,p{margin:0}.muted,small{color:var(--muted)}.good{color:var(--g)}.warn{color:var(--y)}.bad{color:var(--r)}
+.app{display:grid;grid-template-columns:270px 1fr;min-height:100vh}
+.rail{background:var(--rail);border-right:1px solid var(--line);padding:18px;position:sticky;top:0;height:100vh}
+.brand{margin-bottom:22px}.brand h1{font-size:25px}.brand p{font-size:12px;color:var(--muted);margin-top:4px}
+.nav{display:grid;gap:7px}.nav button{text-align:left;background:transparent;border:1px solid transparent;color:#c9d3df}
+.nav button.active,.nav button:hover{background:#111b25;border-color:#263746;color:#fff}
+.node{position:absolute;left:18px;right:18px;bottom:18px;background:#0f171f;border:1px solid var(--line);border-radius:12px;padding:13px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--g);box-shadow:0 0 12px var(--g);margin-right:8px}
+.top{height:74px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 26px;background:#0c1218;position:sticky;top:0;z-index:10}
+.top h2{font-size:20px}.pill{border:1px solid var(--line);background:#0f171f;border-radius:999px;padding:8px 12px;font-size:13px}
+.page{display:none;padding:22px 26px}.page.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.card,.metric,.action-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 12px 28px rgba(0,0,0,.2)}
+.metric span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.metric strong{display:block;font-size:30px;margin:6px 0 2px}
+.s3{grid-column:span 3}.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}.s7{grid-column:span 7}.s8{grid-column:span 8}.s12{grid-column:span 12}
+.list{padding-left:18px;margin:0}.list li{margin-bottom:9px;color:#d4dce6}
+.table{width:100%;border-collapse:collapse}.table th,.table td{text-align:left;border-bottom:1px solid var(--line);padding:9px;font-size:13px;vertical-align:top}.table th{color:var(--muted);font-size:11px;text-transform:uppercase}
+.action-card{border-left:4px solid var(--b);margin-bottom:12px}.action-card.high{border-left-color:var(--g)}.action-card.warn{border-left-color:var(--y)}.action-card.bad{border-left-color:var(--r)}
+.action-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:10px}.money{font-size:28px;font-weight:900;color:var(--g)}
+.button-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.tag{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.kv{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:#0d141c;border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+.bar{height:8px;background:#0b1117;border-radius:999px;overflow:hidden;margin-top:8px}.fill{height:100%;background:var(--g)}
+.check{display:flex;gap:10px;align-items:center;background:#0d141c;border:1px solid var(--line);border-radius:9px;padding:10px;margin-bottom:8px}.check input{width:18px;height:18px}
+.textarea{width:100%;min-height:95px;background:#0d141c;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:12px;font-family:inherit}
+.selectgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.selectbtn{padding:16px;text-align:left;background:#0d141c}
+.book-shell{display:grid;grid-template-columns:285px 1fr;gap:16px}
+.toc{background:#111923;border:1px solid var(--line);border-radius:12px;padding:14px}
+.toc h3{margin-bottom:12px}.toc button{display:block;width:100%;margin-bottom:8px;text-align:left;background:#0d141c}
+.toc button.active{border-color:var(--g);color:#fff}
+.paper{background:linear-gradient(135deg,#f5f0e5,#e9dfce);color:var(--ink);border-radius:14px;padding:26px;border:1px solid #c7bca8;box-shadow:0 24px 50px rgba(0,0,0,.35)}
+.paper h2,.paper h3,.paper h4{color:#182028}.paper p,.paper li{color:#2e343a}.paper small{color:#5b626b}
+.paper-head{display:flex;justify-content:space-between;gap:12px;border-bottom:2px solid #b9ad99;padding-bottom:12px;margin-bottom:16px}
+.paper-section{border-left:4px solid #2c6d4c;background:rgba(255,255,255,.35);padding:13px;margin:12px 0;border-radius:8px}
+.paper-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.manual-step{display:grid;grid-template-columns:34px 1fr;gap:10px;margin:10px 0;padding:10px;background:rgba(255,255,255,.45);border:1px solid #cbbfa9;border-radius:9px}
+.step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#1f4f37;color:white;font-weight:900}
+.figure{background:#e2d6c3;border:1px dashed #9b8d78;border-radius:9px;padding:14px;text-align:center;color:#4b4439;margin-top:10px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.76);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+.modal.show{display:flex}.modal-card{width:min(1050px,100%);max-height:92vh;overflow:auto;background:#101820;border:1px solid var(--line);border-radius:14px;padding:22px}
+.manual-modal{background:linear-gradient(135deg,#f5f0e5,#e9dfce);color:var(--ink);border-color:#c7bca8}
+.manual-modal h2,.manual-modal h3,.manual-modal h4{color:#182028}.manual-modal p,.manual-modal li{color:#2e343a}.manual-modal small{color:#5b626b}
+.badge{display:inline-block;background:rgba(109,168,255,.13);color:var(--b);border:1px solid rgba(109,168,255,.35);padding:6px 9px;border-radius:999px;font-weight:bold;margin-bottom:12px;font-size:12px}
+.manual-modal .badge{background:#203b2c;color:#f2f1e8;border-color:#203b2c}
+.section{background:#0d131a;border:1px solid #243341;border-radius:10px;padding:14px;margin-top:12px}.manual-modal .section{background:rgba(255,255,255,.42);border:1px solid #cbbfa9}
+.section h3{margin-bottom:8px}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}.threecol{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.manual-modal .check{background:rgba(255,255,255,.45);border-color:#cbbfa9;color:#182028}.manual-modal .textarea{background:rgba(255,255,255,.7);color:#182028;border-color:#b7aa95}
+.service-map{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.component{background:#0d141c;border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer}.component:hover{border-color:var(--g)}
+
+.queue-item{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;background:#0d141c;border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:10px}
+.queue-num{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#1f4f37;color:#fff;font-weight:900;font-size:18px}
+.queue-item.critical{border-left:5px solid var(--r)}.queue-item.high{border-left:5px solid var(--y)}.queue-item.normal{border-left:5px solid var(--b)}
+.priority{display:inline-block;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;margin-right:6px}
+.priority.critical{background:rgba(230,87,87,.16);color:#ff9a9a;border:1px solid rgba(230,87,87,.4)}
+.priority.high{background:rgba(231,185,79,.16);color:#ffd987;border:1px solid rgba(231,185,79,.4)}
+.priority.normal{background:rgba(109,168,255,.16);color:#a9cdff;border:1px solid rgba(109,168,255,.4)}
+.device-card{min-height:150px}
+.device-card h3{margin-bottom:8px}
+@media(max-width:900px){
+  .top{height:auto;min-height:68px;padding:12px 14px;gap:10px;align-items:flex-start;flex-direction:column}
+  .top>div:last-child{display:flex;gap:6px;flex-wrap:wrap}
+  .pill{font-size:12px;padding:7px 9px}
+  .page{padding:14px}
+  .card,.metric,.action-card{padding:14px}
+  .metric strong{font-size:26px}
+  .paper{padding:18px;border-radius:12px}
+  .paper-head{display:block}
+  button{min-height:44px}
+}
+@media(max-width:760px){
+  .rail{position:sticky;top:0;height:auto;z-index:50;padding:12px}
+  .brand{margin-bottom:10px}
+  .brand h1{font-size:21px}
+  .nav{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x proximity}
+  .nav button{white-space:nowrap;flex:0 0 auto;scroll-snap-align:start;padding:10px 12px}
+  .node{display:none}
+  .app{display:block}
+  .book-shell{gap:10px}
+  .toc{position:sticky;top:108px;z-index:5;max-height:190px;overflow:auto}
+  .queue-item{grid-template-columns:44px 1fr;align-items:start}
+  .queue-item .button-row{grid-column:1/-1}
+  .queue-num{width:36px;height:36px;font-size:15px}
+  .table{display:block;overflow-x:auto;white-space:nowrap}
+  .manual-step{grid-template-columns:30px 1fr}
+}
+@media(min-width:1500px){
+  body{font-size:18px}
+  .page{max-width:1680px;margin:0 auto}
+  .card,.metric,.action-card{border-radius:16px}
+  button{font-size:16px;min-height:46px}
+}
+@media(pointer:coarse){
+  button,.check input{min-height:46px;min-width:46px}
+  .nav button{min-height:46px}
+}
+
+@media(max-width:1100px){.app{grid-template-columns:1fr}.rail{position:relative;height:auto}.node{position:relative;left:auto;right:auto;bottom:auto;margin-top:16px}.s3,.s4,.s5,.s6,.s7,.s8{grid-column:span 12}.book-shell,.twocol,.threecol,.paper-grid,.service-map,.selectgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="rail">
+  <div class="brand"><h1>Synapse</h1><p>V4.4 Universal Floor System</p></div>
+  <nav class="nav">
+    <button class="active" onclick="page('manual',this)">Manual / Book</button>
+    <button onclick="page('next',this)">What’s Next</button>
+    <button onclick="page('queue',this)">Request Queue</button>
+    <button onclick="page('jobaids',this)">Job Aids</button>
+    <button onclick="page('servicemap',this)">Service Map</button>
+    <button onclick="page('teach',this)">Teach Me</button>
+    <button onclick="page('crib',this)">Tool Crib</button>
+    <button onclick="page('consumables',this)">Consumables</button>
+    <button onclick="page('cases',this)">Similar Cases</button>
+    <button onclick="page('support',this)">Support</button>
+    <button onclick="page('handoff',this)">Handoff</button>
+    <button onclick="page('management',this)">Management</button>
+    <button onclick="page('data',this)">Available Data</button>
+    <button onclick="page('device',this)">Device Ready</button>
+  </nav>
+  <div class="node"><span class="dot"></span><strong>Local Manual Online</strong><br><small>Universal · Request queue · Worker-first</small></div>
+</aside>
+
+<section>
+<header class="top">
+  <div><h2 id="title">Manual / Book</h2><p class="muted">A shop-floor book replacement that turns data into action, result, and knowledge.</p></div>
+  <div><span class="pill" id="statusPill">VF-2 · Normal</span> <span class="pill" id="queuePill">Queue · 0</span> <span class="pill" id="clock">--:--</span></div>
+</header>
+
+<div id="manual" class="page active">
+  <div class="book-shell">
+    <aside class="toc">
+      <h3>Operations Manual</h3>
+      <button class="active" onclick="manualChapter('overview',this)">00 · Start Here</button>
+      <button onclick="manualChapter('safety',this)">01 · Safety First</button>
+      <button onclick="manualChapter('toolchange',this)">02 · Tool Change</button>
+      <button onclick="manualChapter('coolant',this)">03 · Coolant System</button>
+      <button onclick="manualChapter('startup',this)">04 · Startup / Warmup</button>
+      <button onclick="manualChapter('quality',this)">05 · Quality Check</button>
+      <button onclick="manualChapter('support',this)">06 · Need Support</button>
+    </aside>
+    <main class="paper" id="manualPage"></main>
+  </div>
+</div>
+
+<div id="next" class="page">
+  <div class="grid">
+    <div class="metric s3"><span>Next Best Action</span><strong id="nbaTitle">Stage T12</strong><small id="nbaWhy">Based on tool life + handoff</small></div>
+    <div class="metric s3"><span>Expected Downtime</span><strong id="nbaTime">2m</strong><small>known before starting</small></div>
+    <div class="metric s3"><span>Expected Gain</span><strong id="nbaGain">+7</strong><small>parts protected</small></div>
+    <div class="metric s3"><span>Confidence</span><strong id="nbaConf">High</strong><small>from available data</small></div>
+    <div class="card s8"><h3>Recommended action</h3><div id="nextCard"></div></div>
+    <div class="card s4"><h3>Recommendation inputs</h3><ul class="list" id="whyPicked"></ul></div>
+    <div class="card s12"><h3>Live request queue</h3><p class="muted">Consumables, tool crib items, and support requests land here in the order they should be handled.</p><div id="queuePreview" style="margin-top:12px"></div></div>
+  </div>
+</div>
+
+
+<div id="queue" class="page">
+  <div class="grid">
+    <div class="metric s3"><span>Open Requests</span><strong id="openReqCount">0</strong><small>active</small></div>
+    <div class="metric s3"><span>Next To Fix</span><strong id="nextReqName">None</strong><small>highest priority</small></div>
+    <div class="metric s3"><span>Critical</span><strong id="criticalReqCount">0</strong><small>low stock / urgent</small></div>
+    <div class="metric s3"><span>Device</span><strong id="deviceMode">Ready</strong><small>responsive</small></div>
+    <div class="card s8"><h3>Order of fixing</h3><p class="muted">This is the visible work queue. When someone requests coolant, filters, rags, tools, or help, it lands here with a priority and status.</p><div id="requestQueueBoard" style="margin-top:14px"></div></div>
+    <div class="card s4"><h3>Queue rules</h3><ul class="list"><li>Critical stock goes first.</li><li>Safety/support requests stay visible.</li><li>Tool crib items show source and location.</li><li>Delivered items can be closed after the floor confirms it.</li></ul></div>
+    <div class="card s12"><h3>Closed / delivered history</h3><ul class="list" id="closedQueueList"></ul></div>
+  </div>
+</div>
+
+<div id="jobaids" class="page">
+  <div class="grid">
+    <div class="card s12"><h3>Job Aid Library</h3><p class="muted">Each procedure reads like a manual page: why, safety, tools, parts, supplies, steps, success criteria, mistakes, escalation, similar cases, and result capture.</p><div id="jobAidGrid" style="margin-top:14px"></div></div>
+  </div>
+</div>
+
+<div id="servicemap" class="page">
+  <div class="grid">
+    <div class="card s12"><h3>Interactive Service Map</h3><p class="muted">The digital twin becomes navigation. Click a component to get health, manual, parts, past issues, and procedures.</p><div class="service-map" id="serviceMap" style="margin-top:14px"></div></div>
+  </div>
+</div>
+
+<div id="teach" class="page">
+  <div class="grid">
+    <div class="card s5"><h3>Teach Me Mode</h3><p class="muted">For new workers: learn the task without needing someone to stand over you.</p><div class="selectgrid" style="margin-top:14px"><button onclick="teach('tool')">Teach Tool Change</button><button onclick="teach('coolant')">Teach Coolant Check</button><button onclick="teach('fixture')">Teach Fixture Verify</button><button onclick="teach('startup')">Teach Startup</button></div></div>
+    <div class="card s7"><h3>Training includes</h3><ul class="list"><li>Manual page</li><li>Show Me Why</li><li>Checklist</li><li>Common mistakes</li><li>Quick quiz</li><li>Verification step</li><li>Result capture</li></ul></div>
+  </div>
+</div>
+
+<div id="crib" class="page">
+  <div class="grid">
+    <div class="card s12"><h3>Tool Crib Locations</h3><table class="table"><thead><tr><th>Item</th><th>Location</th><th>Used For</th><th>Stock</th><th></th></tr></thead><tbody id="cribTable"></tbody></table></div>
+  </div>
+</div>
+
+<div id="consumables" class="page">
+  <div class="grid">
+    <div class="card s8"><h3>Consumables Tracking</h3><div id="consumableList"></div></div>
+    <div class="card s4"><h3>Small thing, big impact</h3><ul class="list"><li>No waiting on oil, coolant, filters, rags, or gloves.</li><li>Maintenance sees next need before the machine stops.</li><li>Every procedure knows what it consumes.</li><li>Stock requests become part of the manual flow.</li></ul></div>
+  </div>
+</div>
+
+<div id="cases" class="page">
+  <div class="grid">
+    <div class="card s12"><h3>Similar Cases Database</h3><table class="table"><thead><tr><th>Issue</th><th>Past fix</th><th>Result</th><th>Success</th><th>Verified by</th><th></th></tr></thead><tbody id="casesTable"></tbody></table></div>
+  </div>
+</div>
+
+<div id="support" class="page">
+  <div class="grid">
+    <div class="card s5"><h3>Need Support</h3><p class="muted">This is not failure. This is the safe exit. Synapse logs machine, job, procedure, time, and issue.</p><div class="selectgrid" style="margin-top:14px"><button onclick="supportReq('Maintenance')">Maintenance</button><button onclick="supportReq('Supervisor')">Supervisor</button><button onclick="supportReq('Tool Crib')">Tool Crib</button><button onclick="supportReq('Quality')">Quality</button></div></div>
+    <div class="card s7"><h3>Open support requests</h3><ul class="list" id="supportList"></ul></div>
+  </div>
+</div>
+
+<div id="handoff" class="page">
+  <div class="grid">
+    <div class="card s5"><h3>Paperless Shift Handoff</h3><div id="handoffChecks"></div><textarea id="handoffNote" class="textarea" placeholder="Notes for next shift..."></textarea><div class="button-row"><button onclick="submitHandoff()">Submit Handoff</button><button onclick="clearHandoff()">Clear</button></div></div>
+    <div class="card s7"><h3>Previous shift notes</h3><ul class="list" id="handoffList"></ul></div>
+  </div>
+</div>
+
+<div id="management" class="page">
+  <div class="grid">
+    <div class="metric s3"><span>Lost Today</span><strong id="lostToday">$0</strong></div>
+    <div class="metric s3"><span>Recoverable Annual</span><strong id="recoverable">$0</strong></div>
+    <div class="metric s3"><span>Manual Use</span><strong id="manualUse">0</strong><small>job aids opened</small></div>
+    <div class="metric s3"><span>Playbook Success</span><strong id="successRate">--</strong></div>
+    <div class="card s6"><h3>Money view</h3><ul class="list" id="moneyList"></ul></div>
+    <div class="card s6"><h3>Blunt proof</h3><ul class="list" id="enablementProof"></ul></div>
+  </div>
+</div>
+
+<div id="data" class="page">
+  <div class="grid">
+    <div class="card s12"><h3>Available Data → Manual Action</h3><table class="table"><thead><tr><th>Available data</th><th>Current value</th><th>Used to decide</th><th>Manual action</th></tr></thead><tbody id="dataTable"></tbody></table></div>
+  </div>
+</div>
+
+
+<div id="device" class="page">
+  <div class="grid">
+    <div class="card s12"><h3>Universal Device Readiness</h3><p class="muted">Single-file page. Works on GitHub Pages, phone browsers, iPad, laptop, and headset browsers. Local logs persist per device through browser storage.</p></div>
+    <div class="card s3 device-card"><h3>Phone</h3><ul class="list"><li>Horizontal scroll nav</li><li>Large touch targets</li><li>Stacked cards</li><li>Readable manual pages</li></ul></div>
+    <div class="card s3 device-card"><h3>iPad / Tablet</h3><ul class="list"><li>Two-column layouts where useful</li><li>Sticky manual table of contents</li><li>Touch-first buttons</li></ul></div>
+    <div class="card s3 device-card"><h3>Laptop / Desktop</h3><ul class="list"><li>Full side navigation</li><li>Wide manual pages</li><li>Management and data views visible</li></ul></div>
+    <div class="card s3 device-card"><h3>VR / Headset Browser</h3><ul class="list"><li>Big cards on wide screens</li><li>Coarse pointer support</li><li>No download dependencies</li></ul></div>
+    <div class="card s12"><h3>Important reality</h3><p class="muted">This demo saves data locally on each device. For a real shop-wide shared queue, the Raspberry Pi node or server should sync the request queue across devices.</p></div>
+  </div>
+</div>
+
+</section>
+</div>
+
+<div id="modal" class="modal"><div class="modal-card" id="modalContent"></div></div>
+
+<script>
+const machine={name:'VF-2 Demo Cell',job:'Bracket-A',mode:'running',parts:143,cycle:31,idle:620,stop:180,scrap:2,temp:58,vib:.92,power:1600,rpm:7200,feed:52,toolLife:34,coolant:true,startupDelta:27,airPressure:86};
+const rates={machineHour:95,partValue:18,scrapCost:24};
+const storeKey='synapse43';
+let saved=JSON.parse(localStorage.getItem(storeKey)||'{}');
+let state={
+  handoffState:saved.handoffState||{},
+  handoffs:saved.handoffs||['Previous shift: T12 nearing replacement. Coolant checked. Fixture A looked good.'],
+  supports:saved.supports||[],
+  requests:saved.requests||[],
+  results:saved.results||[],
+  wins:saved.wins||['Coolant concern checked early · scrap risk reduced'],
+  opens:saved.opens||0
+};
+function save(){localStorage.setItem(storeKey,JSON.stringify(state))}
+const handoffItems=['Machine status noted','Open issues listed','Tools near replacement noted','Service completed logged','Safety concerns noted','Consumables low noted','Similar case added if useful'];
+const crib=[
+  ['T12 Drill','Tool Cabinet 2 · Drawer B4','Tool change',42],
+  ['Torque Wrench','Calibration Cabinet · Slot 3','Fixture / holder verification',8],
+  ['Presetter','Tool Room Bench 1','Offset verification',2],
+  ['Refractometer','Quality Cart · Top Drawer','Coolant concentration',5],
+  ['Indicator','Inspection Cabinet · A2','Fixture verification',12],
+  ['Cabinet Filter','Maintenance Cage · F1','Electrical cabinet service',24]
+];
+const consumables=[
+  ['Coolant Concentrate',62,'Aisle 3 / Chem Cabinet','Last replaced 8 days ago','Next need: 6 days'],
+  ['Way Oil',48,'Maintenance Cage B2','Last filled 3 days ago','Next need: 9 days'],
+  ['Hydraulic Oil',72,'Maintenance Cage B4','Last replaced 42 days ago','Next need: 18 days'],
+  ['Grease',55,'Maintenance Shelf G2','Last used yesterday','Next need: 11 days'],
+  ['Air Filters',31,'Shelf F1','Last replaced 28 days ago','Next need: 2 days'],
+  ['Cabinet Filters',24,'Shelf F1','Last replaced 54 days ago','Next need: now'],
+  ['Shop Rags',78,'Tool Crib Front','Used daily','Next need: 14 days'],
+  ['Nitrile Gloves',35,'PPE Rack','Used daily','Next need: 3 days']
+];
+const cases=[
+  ['Spindle temperature high','Coolant return cleared and nozzle angle corrected','Temp dropped within 12 min','91%','Mike'],
+  ['T12 chatter on Bracket-A','Replaced T12 and verified offset','Chatter reduced on Op 3','88%','Joe'],
+  ['Long setup wait','Tool cart staged before cycle end','Setup reduced from 17m to 11m','94%','Nate'],
+  ['Fixture drift','Clamp order updated and chips cleared','Rework avoided next run','86%','Ana'],
+  ['Startup time high','Air pressure checked and warmup checklist repeated','Startup returned to normal','79%','Sam']
+];
+const aids={
+tool:{code:'CH-02',title:'Stage / Replace T12 Drill',time:'2-3 min',difficulty:'Medium',impact:'+7 parts protected',savings:'$126 protected',risk:'High',confidence:'92%',manual:'Tooling',why:['T12 life is near the replacement window.','Staging before the machine stops prevents setup delay.','Offset verification prevents scrap after replacement.'],safety:['Wear safety glasses.','Confirm machine is paused or in safe state.','Keep hands clear of spindle and tool changer.','Do not restart until offset has been verified.'],tools:['T12 Drill · Tool Cabinet 2 Drawer B4','Wrench · Tool Cabinet 2 Drawer A1','Presetter · Tool Room Bench 1','Offset sheet · Job packet'],parts:['T12 replacement drill','Clean holder if required'],supplies:['Shop rag','Nitrile gloves'],steps:['Move tool cart to VF-2 before cycle end.','Verify replacement tool matches traveler.','Pause machine at safe point.','Move spindle to safe height.','Replace or inspect T12.','Verify offset.','Run dry check.','Log result.'],good:['Tool seats cleanly.','Offset is verified.','Dry check passes.','No abnormal sound on restart.'],mistakes:['Skipping offset verification.','Replacing tool without checking holder.','Restarting without dry check.'],escalate:['Tool holder does not seat cleanly.','Alarm repeats after change.','Abnormal spindle noise.'],data:['Tool life 34%','Handoff mentioned T12','Current job uses T12 on Op 3'],cases:['T12 chatter reduced after replacement on Bracket-A.','Offset mismatch caused scrap last week; dry check prevented repeat.']},
+coolant:{code:'CH-03',title:'Coolant Flow Check',time:'5 min',difficulty:'Low',impact:'Lower scrap risk',savings:'$48-$240 risk avoided',risk:'Medium',confidence:'89%',manual:'Coolant',why:['Low coolant flow can reduce tool life.','Blocked return can increase spindle heat.','Coolant issues often show up as scrap later.'],safety:['Wear glasses and gloves.','Avoid skin contact with contaminated coolant.','Do not reach into machine while spindle is active.'],tools:['Flashlight · Tool Cabinet 1','Refractometer · Quality Cart top drawer'],parts:['Coolant concentrate if low'],supplies:['Gloves','Shop rag'],steps:['Confirm machine is safe.','Check coolant level.','Inspect nozzle flow.','Clear visible chip blockage.','Check return path.','Verify concentration if needed.','Log result.'],good:['Steady nozzle flow.','Level above minimum.','No chips blocking return.','No strong odor or discoloration.'],mistakes:['Only checking tank level, not nozzle flow.','Ignoring chips in return path.','Restarting without confirming flow.'],escalate:['Pump does not restart.','Coolant smells rancid.','Flow remains weak after clearing.'],data:['Temperature 58°C','Coolant ON','Scrap count 2'],cases:['High temp fixed by clearing blocked return.','Scrap reduced after nozzle angle correction.']},
+fixture:{code:'CH-04',title:'Fixture A Verification',time:'2 min',difficulty:'Low',impact:'Avoid rework',savings:'$180 rework risk avoided',risk:'Medium',confidence:'84%',manual:'Setup',why:['Fixture movement causes dimensional drift.','Quick clamp checks prevent rework.','Chips under a fixture can look fine until measurement fails.'],safety:['Machine stopped or safe.','Keep hands clear of sharp chips.'],tools:['Allen key · Tool Cabinet 3','Indicator · Inspection Cabinet A2'],parts:['Fixture hardware if missing'],supplies:['Chip brush'],steps:['Stop at safe point.','Brush fixture surface.','Check clamp order.','Verify fixture seating.','Confirm part is secure.','Log result.'],good:['Fixture clean.','Clamps seated.','Part cannot shift by hand.'],mistakes:['Checking clamps without clearing chips.','Assuming previous setup is still tight.'],escalate:['Fixture will not seat flat.','Missing or damaged hardware.'],data:['Vibration 0.92','Known fixture note in handoff'],cases:['Fixture A looseness caused rework; clamp sequence note solved repeat issue.']},
+startup:{code:'CH-05',title:'Startup Behavior Changed',time:'4 min',difficulty:'Low',impact:'Prevent abnormal startup loss',savings:'$95/hr downtime exposure',risk:'Medium',confidence:'81%',manual:'Startup',why:['Startup time is 27% above normal.','Behavior changed is more useful than anomaly detected.','Likely causes include air pressure, skipped warmup, or tool changer delay.'],safety:['Machine guards closed.','E-stop location verified.','No person inside machine envelope.'],tools:['Startup checklist','Air pressure gauge'],parts:['None expected'],supplies:['None expected'],steps:['Review startup checklist.','Confirm air pressure.','Confirm warmup cycle completed.','Watch tool changer movement.','Log what changed.'],good:['Startup time returns to baseline.','No repeat alarm.','Air pressure stable.'],mistakes:['Ignoring startup delay because machine eventually runs.','Skipping warmup when behind schedule.'],escalate:['Startup delay repeats 3 times.','Air pressure drops below spec.','Tool changer stalls.'],data:['Startup +27% above baseline','Air pressure 86 PSI'],cases:['Startup time high fixed after air pressure check.']}
+};
+const components=[
+  ['Spindle','Temp 58°C · Vibration 0.92','Manual, parts, past issues','coolant'],
+  ['Tool Changer','T12 34% life','Tool change procedure','tool'],
+  ['Coolant System','Flow normal · temp rising','Coolant check','coolant'],
+  ['Fixture / Table','Fixture A note active','Fixture verify','fixture'],
+  ['Air System','86 PSI','Startup behavior','startup'],
+  ['Electrical Cabinet','Cabinet filters low','Filter service','startup']
+];
+function money(v){return '$'+Math.round(v).toLocaleString()}
+function costs(){let idle=machine.idle/3600*rates.machineHour,down=machine.stop/3600*rates.machineHour,scrap=machine.scrap*rates.scrapCost,lost=Math.floor((machine.idle+machine.stop)/42);return{idle,down,scrap,total:idle+down+scrap,lost,annual:(idle+down+scrap)*260}}
+function page(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');title.innerText=btn.innerText}
+function manualChapter(id,btn){document.querySelectorAll('.toc button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');manualPage.innerHTML=chapters[id]()}
+function chapterHeader(num,title,subtitle){return `<div class="paper-head"><div><small>SYNAPSE PAPERLESS OPERATIONS MANUAL</small><h2>${num} · ${title}</h2><p>${subtitle}</p></div><div><small>Machine</small><h3>${machine.name}</h3><small>Job ${machine.job}</small></div></div>`}
+const chapters={
+overview:()=>chapterHeader('00','Start Here','This is not a dashboard. This is the shop-floor book replacement.')+`
+<div class="paper-section"><h3>Operating rule</h3><p>Data becomes action. Action becomes result. Result becomes knowledge. Knowledge becomes the next best action.</p></div>
+<div class="paper-grid"><div class="paper-section"><h3>For the operator</h3><ul><li>What should I do next?</li><li>How do I do it safely?</li><li>What tools and parts do I need?</li><li>What does good look like?</li><li>When should I ask for support?</li></ul></div><div class="paper-section"><h3>For management</h3><ul><li>Lost time and recoverable value.</li><li>Which playbooks worked.</li><li>Which supplies caused delays.</li><li>What support was requested before failures.</li></ul></div></div>
+<div class="figure">Paper eliminated: manuals + logs + handoff + tribal knowledge live inside the machine node.</div>`,
+safety:()=>chapterHeader('01','Safety First','Every procedure begins with safety before speed.')+`
+<div class="paper-section"><h3>Before any procedure</h3><div class="manual-step"><div class="step-num">1</div><div>Wear required PPE: safety glasses, hearing protection, gloves when handling chips/coolant.</div></div><div class="manual-step"><div class="step-num">2</div><div>Verify machine state: stopped, paused, or safe for the task.</div></div><div class="manual-step"><div class="step-num">3</div><div>Know the E-stop location and do not bypass guards or interlocks.</div></div></div>
+<div class="paper-section"><h3>Blunt rule</h3><p>If the job aid says “need support,” that is not failure. That is using the system correctly.</p></div>`,
+toolchange:()=>manualAidPage('tool'),
+coolant:()=>manualAidPage('coolant'),
+startup:()=>manualAidPage('startup'),
+quality:()=>chapterHeader('05','Quality Check','Quality is not only inspection. It is catching drift before scrap.')+`
+<div class="paper-section"><h3>Checkpoints</h3><ul><li>Confirm traveler matches material and operation.</li><li>Confirm fixture is clean and clamped.</li><li>Confirm tool offset after change.</li><li>Compare first article against known-good part.</li></ul></div><div class="paper-section"><h3>Escalate if</h3><ul><li>Measurement drift repeats.</li><li>Fixture does not seat cleanly.</li><li>Tool marks look abnormal.</li></ul></div>`,
+support:()=>chapterHeader('06','Need Support','Support requests are the safe exit path.')+`
+<div class="paper-section"><h3>What gets logged</h3><ul><li>Machine</li><li>Job</li><li>Procedure</li><li>Time</li><li>Issue type</li></ul></div><div class="paper-section"><h3>Why this matters</h3><p>Support logs prove the worker asked for help before a small issue became downtime, scrap, or a safety issue.</p><button onclick="supportReq('Manual support request')">Request Support</button></div>`
+};
+function manualAidPage(key){const a=aids[key];return chapterHeader(a.code,a.title,`Time ${a.time} · Difficulty ${a.difficulty} · Expected impact ${a.impact}`)+`
+<div class="paper-section"><h3>Show Me Why</h3><ul>${a.why.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+<div class="paper-grid"><div class="paper-section"><h3>Tools Needed</h3><ul>${a.tools.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="paper-section"><h3>Parts / Supplies</h3><ul>${a.parts.concat(a.supplies).map(x=>`<li>${x}</li>`).join('')}</ul></div></div>
+<div class="paper-section"><h3>Step-by-step</h3>${a.steps.map((x,i)=>`<div class="manual-step"><div class="step-num">${i+1}</div><div>${x}</div></div>`).join('')}</div>
+<div class="paper-grid"><div class="paper-section"><h3>What Good Looks Like</h3><ul>${a.good.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="paper-section"><h3>Escalate If</h3><ul>${a.escalate.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>
+<button onclick="openAid('${key}')">Open interactive checklist</button>`}
+function nextBest(){if(state.handoffs[0]&&state.handoffs[0].toLowerCase().includes('t12'))return ['tool','Stage T12','handoff + tool life'];if(machine.temp>56)return ['coolant','Coolant Flow Check','temperature trend'];if(machine.startupDelta>20)return ['startup','Review Startup Checklist','behavior changed'];return ['fixture','Verify Fixture A','vibration + known issue']}
+function openAid(key){state.opens++;save();const a=aids[key];modalContent.className='modal-card manual-modal';modalContent.innerHTML=`<span class="badge">${a.code} · INTERACTIVE MANUAL PAGE</span><div class="paper-head"><div><small>${a.manual.toUpperCase()} PROCEDURE</small><h2>${a.title}</h2><p>Time: ${a.time} · Difficulty: ${a.difficulty} · Risk reduction: ${a.risk} · Confidence: ${a.confidence}</p></div><div><small>Impact</small><h3>${a.impact}</h3><small>${a.savings}</small></div></div>
+<div class="twocol"><div class="section"><h3>Show Me Why</h3><ul>${a.why.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="section"><h3>Available Data Used</h3><ul>${a.data.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>
+<div class="section"><h3>Safety First</h3><ul>${a.safety.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+<div class="threecol"><div class="section"><h3>Tools Needed</h3><ul>${a.tools.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="section"><h3>Parts Needed</h3><ul>${a.parts.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="section"><h3>Supplies Needed</h3><ul>${a.supplies.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>
+<div class="section"><h3>Procedure Checklist</h3>${a.steps.map((x,i)=>`<label class="check"><input type="checkbox"><span>${i+1}. ${x}</span></label>`).join('')}</div>
+<div class="twocol"><div class="section"><h3>What Good Looks Like</h3><ul>${a.good.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="section"><h3>Common Mistakes</h3><ul>${a.mistakes.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>
+<div class="twocol"><div class="section"><h3>Escalate / Need Support If</h3><ul>${a.escalate.map(x=>`<li>${x}</li>`).join('')}</ul><button onclick="supportReq('Support from ${a.title}')">Need Support</button></div><div class="section"><h3>Similar Past Fixes</h3><ul>${a.cases.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>
+<div class="section"><h3>Result Capture</h3><p>Did this solve the issue?</p><div class="button-row"><button onclick="captureResult('${a.title}','Fixed')">Fixed</button><button onclick="captureResult('${a.title}','Improved')">Improved</button><button onclick="captureResult('${a.title}','Needs support')">Needs support</button><button onclick="captureResult('${a.title}','No change')">No change</button></div><textarea id="resultNote" class="textarea" placeholder="Optional note for next shift / knowledge base..."></textarea></div>
+<div class="actions"><button onclick="closeModal()">Close manual page</button></div>`;document.getElementById('modal').classList.add('show')}
+function teach(key){const a=aids[key]||aids.tool;modalContent.className='modal-card manual-modal';modalContent.innerHTML=`<span class="badge">TEACH ME MODE</span><h2>${a.title}</h2><div class="section"><h3>Lesson Objective</h3><p>Complete the task safely, know why it matters, avoid common mistakes, and verify the result.</p></div><div class="twocol"><div class="section"><h3>Learn</h3><ul><li>Read the manual page.</li><li>Review tools and parts.</li><li>Study common mistakes.</li></ul></div><div class="section"><h3>Verify</h3><ul><li>What good looks like: ${a.good[0]}</li><li>Escalate if: ${a.escalate[0]}</li><li>Confidence target: worker can explain why the step matters.</li></ul></div></div><div class="section"><h3>Quick Quiz</h3><p>Before restart, what must be verified?</p><button onclick="captureResult('Training: ${a.title}','Verified')">Offset / success check verified</button></div><div class="actions"><button onclick="openAid('${key}')">Open full manual</button><button onclick="closeModal()">Close</button></div>`;document.getElementById('modal').classList.add('show')}
+function captureResult(action,result){let note=(document.getElementById('resultNote')||{}).value||'';state.results.unshift({action,result,note,time:new Date().toLocaleTimeString()});state.wins.unshift(`${action}: ${result}`);save();render();closeModal()}
+
+function requestPriority(type,stock){
+  if(type.includes('Support')) return {score:1,label:'Critical',cls:'critical'};
+  if(type==='Consumable' && Number(stock)<=30) return {score:1,label:'Critical',cls:'critical'};
+  if(type==='Consumable' && Number(stock)<=50) return {score:2,label:'High',cls:'high'};
+  if(type==='Tool Crib' && Number(stock)<=5) return {score:2,label:'High',cls:'high'};
+  return {score:3,label:'Normal',cls:'normal'};
+}
+function openRequests(){
+  return (state.requests||[]).filter(r=>r.status!=='Closed').sort((a,b)=>a.priority-b.priority || a.created-b.created);
+}
+function closedRequests(){
+  return (state.requests||[]).filter(r=>r.status==='Closed').sort((a,b)=>b.created-a.created);
+}
+function requestItem(item,type,stock,source){
+  state.requests=state.requests||[];
+  const p=requestPriority(type,stock);
+  const req={id:Date.now()+Math.random(),item,type,stock,source:source||'Floor request',priority:p.score,priorityLabel:p.label,priorityClass:p.cls,status:'Requested',time:new Date().toLocaleTimeString(),created:Date.now(),machine:machine.name,job:machine.job};
+  state.requests.push(req);
+  state.wins.unshift(`${type} requested: ${item}`);
+  save();render();
+  const pos=openRequests().findIndex(r=>r.id===req.id)+1;
+  modal('ADDED TO REQUEST QUEUE',item,[`Queue position: #${pos}`,`Priority: ${p.label}`,`Type: ${type}`,`Source/location: ${req.source}`,`Status: Requested`,`Machine: ${machine.name}`,`Job: ${machine.job}`]);
+}
+function advanceRequest(id){
+  const req=state.requests.find(r=>r.id===id); if(!req)return;
+  const flow=['Requested','Picked','In Transit','Delivered'];
+  const i=flow.indexOf(req.status);
+  req.status=i>=0 && i<flow.length-1 ? flow[i+1] : 'Delivered';
+  if(req.status==='Delivered') state.wins.unshift(`${req.item} delivered to floor`);
+  save();render();
+}
+function closeRequest(id){
+  const req=state.requests.find(r=>r.id===id); if(!req)return;
+  req.status='Closed';
+  req.closed=new Date().toLocaleTimeString();
+  state.wins.unshift(`${req.item} closed from request queue`);
+  save();render();
+}
+function queueHTML(limit){
+  const rows=openRequests().slice(0,limit||999);
+  if(!rows.length) return '<p class="muted">No open requests. Consumable and tool requests will appear here.</p>';
+  return rows.map((r,i)=>`<div class="queue-item ${r.priorityClass}"><div class="queue-num">${i+1}</div><div><h3>${r.item}</h3><p class="muted">${r.type} · ${r.source}</p><p><span class="priority ${r.priorityClass}">${r.priorityLabel}</span><span class="pill">${r.status}</span> <small>${r.time} · ${r.machine} · ${r.job}</small></p></div><div class="button-row"><button onclick="advanceRequest(${r.id})">${r.status==='Delivered'?'Delivered':'Next Status'}</button><button onclick="closeRequest(${r.id})">Close</button></div></div>`).join('');
+}
+function currentDeviceMode(){
+  const w=window.innerWidth;
+  if(w<700) return 'Phone';
+  if(w<1100) return 'Tablet';
+  if(w>1500) return 'VR/Wide';
+  return 'Laptop';
+}
+
+function supportReq(type){state.supports.unshift({type,time:new Date().toLocaleTimeString(),machine:machine.name,job:machine.job});save();requestItem(type,'Support Request',0,'Worker support path')}
+function submitHandoff(){let note=document.getElementById('handoffNote').value||'No extra notes entered.';let checked=Object.entries(state.handoffState).filter(x=>x[1]).map(x=>x[0]).join(', ');state.handoffs.unshift(`${new Date().toLocaleTimeString()} · ${note} Completed: ${checked||'none checked'}`);save();render()}
+function clearHandoff(){state.handoffState={};document.getElementById('handoffNote').value='';save();render()}
+function modal(b,t,items){modalContent.className='modal-card';modalContent.innerHTML=`<span class="badge">${b}</span><h2>${t}</h2><div class="section">${items.map(x=>`<p style="margin:8px 0">${x}</p>`).join('')}</div><div class="actions"><button onclick="closeModal()">Close</button></div>`;document.getElementById('modal').classList.add('show')}
+function closeModal(){document.getElementById('modal').classList.remove('show')}document.getElementById('modal').onclick=e=>{if(e.target.id==='modal')closeModal()}
+function render(){
+  clock.innerText=new Date().toLocaleTimeString();
+
+  const openReq=openRequests(), closedReq=closedRequests();
+  if(document.getElementById('queuePill')) queuePill.innerText=`Queue · ${openReq.length}`;
+  if(document.getElementById('openReqCount')) openReqCount.innerText=openReq.length;
+  if(document.getElementById('criticalReqCount')) criticalReqCount.innerText=openReq.filter(r=>r.priority===1).length;
+  if(document.getElementById('nextReqName')) nextReqName.innerText=openReq[0]?openReq[0].item:'None';
+  if(document.getElementById('deviceMode')) deviceMode.innerText=currentDeviceMode();
+  if(document.getElementById('requestQueueBoard')) requestQueueBoard.innerHTML=queueHTML();
+  if(document.getElementById('queuePreview')) queuePreview.innerHTML=queueHTML(3);
+  if(document.getElementById('closedQueueList')) closedQueueList.innerHTML=closedReq.length?closedReq.slice(0,10).map(r=>`<li>${r.closed||r.time} · ${r.item} · ${r.type} · closed</li>`).join(''):'<li>No closed requests yet.</li>';
+
+  let co=costs(),nb=nextBest(),a=aids[nb[0]],fixed=state.results.filter(r=>['Fixed','Improved','Verified'].includes(r.result)).length;
+  nbaTitle.innerText=nb[1];nbaWhy.innerText='Based on '+nb[2];nbaTime.innerText=a.time;nbaGain.innerText=a.impact;nbaConf.innerText=a.confidence;
+  nextCard.innerHTML=`<div class="action-card high"><div class="action-head"><div><h3>${a.title}</h3><p class="muted">${a.time} · ${a.impact} · ${a.savings}</p></div><div class="money">${a.confidence}</div></div><p>${a.why[0]}</p><div class="button-row"><button onclick="openAid('${nb[0]}')">Open manual page</button><button onclick="teach('${nb[0]}')">Teach me</button><button onclick="supportReq('Support for ${a.title}')">Need support</button></div></div>`;
+  whyPicked.innerHTML=[`Signal: ${nb[2]}`,`Tool life: ${machine.toolLife}%`,`Temp: ${machine.temp}°C`,`Startup: +${machine.startupDelta}% above baseline`,`Handoff count: ${state.handoffs.length}`,`Past results: ${state.results.length}`].map(x=>`<li>${x}</li>`).join('');
+  jobAidGrid.innerHTML=Object.keys(aids).map(k=>`<div class="kv"><div><strong>${aids[k].code} · ${aids[k].title}</strong><br><small>${aids[k].time} · ${aids[k].impact} · Confidence ${aids[k].confidence}</small></div><button onclick="openAid('${k}')">Open Manual</button></div>`).join('');
+  serviceMap.innerHTML=components.map(c=>`<div class="component" onclick="openAid('${c[3]}')"><h3>${c[0]}</h3><p class="muted">${c[1]}</p><small>${c[2]}</small></div>`).join('');
+  cribTable.innerHTML=crib.map(c=>`<tr><td>${c[0]}</td><td>${c[1]}</td><td>${c[2]}</td><td>${c[3]}</td><td><button onclick="requestItem(c[0],'Tool Crib',c[3],c[1])">Request</button></td></tr>`).join('');
+  consumableList.innerHTML=consumables.map(c=>`<div class="kv"><div><strong>${c[0]}</strong><div class="bar"><div class="fill" style="width:${c[1]}%;background:${c[1]<35?'var(--r)':c[1]<50?'var(--y)':'var(--g)'}"></div></div><small>${c[1]}% · ${c[2]} · ${c[3]} · ${c[4]}</small></div><button onclick="requestItem(c[0],'Consumable',c[1],c[2]+' · '+c[4])">Request</button></div>`).join('');
+  casesTable.innerHTML=cases.map(c=>`<tr><td>${c[0]}</td><td>${c[1]}</td><td>${c[2]}</td><td>${c[3]}</td><td>${c[4]}</td><td><button onclick="modal('SIMILAR CASE','${c[0]}',['Past fix: ${c[1]}','Result: ${c[2]}','Success rate: ${c[3]}','Verified by: ${c[4]}'])">View</button></td></tr>`).join('');
+  supportList.innerHTML=state.supports.length?state.supports.map(s=>`<li>${s.time} · ${s.type} · ${s.machine} · ${s.job}</li>`).join(''):'<li>No support requests yet.</li>';
+  handoffChecks.innerHTML=handoffItems.map(i=>`<label class="check"><input type="checkbox" ${state.handoffState[i]?'checked':''} onchange="state.handoffState['${i}']=this.checked;save()"><span>${i}</span></label>`).join('');
+  handoffList.innerHTML=state.handoffs.map(h=>`<li>${h}</li>`).join('');
+  lostToday.innerText=money(co.total);recoverable.innerText=money(co.annual*.72);manualUse.innerText=state.opens;successRate.innerText=state.results.length?Math.round(fixed/state.results.length*100)+'%':'--';
+  moneyList.innerHTML=`<li>Idle cost today: ${money(co.idle)}</li><li>Downtime cost today: ${money(co.down)}</li><li>Scrap cost today: ${money(co.scrap)}</li><li>Estimated lost parts: ${co.lost}</li>`;
+  enablementProof.innerHTML=`<li>Blunt truth: paper gets lost, ignored, or outdated.</li><li>Synapse gives workers the exact manual page at the machine.</li><li>${Object.keys(aids).length} rich manual-grade job aids loaded.</li><li>${state.supports.length} support requests logged before failure.</li><li>${(state.requests||[]).length} queue requests tracked in order of fixing.</li><li>${state.results.length} procedure results captured into knowledge.</li><li>${state.handoffs.length} handoffs preserved without paper.</li>`;
+  dataTable.innerHTML=[['Machine state',machine.mode,'Whether to guide, stop, or escalate','Show safe procedure only'],['Tool life','T12 '+machine.toolLife+'%','Replacement window','Stage / replace T12'],['Temperature',machine.temp+'°C','Cooling behavior','Coolant check'],['Vibration',machine.vib,'Fixture/tool risk','Fixture verify or tool check'],['Startup time','+'+machine.startupDelta+'% above normal','Behavior changed','Review startup checklist'],['Air pressure',machine.airPressure+' PSI','Startup/tool changer cause','Air system check'],['Idle time',machine.idle+' sec','Lost capacity','Stage material/tools'],['Stopped time',machine.stop+' sec','Downtime cost','Support request'],['Scrap',machine.scrap,'Quality loss','Coolant/tool/fixture aid'],['Consumables',consumables.map(c=>c[0]+':'+c[1]+'%').join(', '),'Supply readiness','Tool crib request'],['Result captures',state.results.length,'Playbook success','Improve recommendations'],['Similar cases',cases.length,'Past fix retrieval','Show likely solutions']].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('');
+}
+setInterval(render,1000);manualPage.innerHTML=chapters.overview();render();
+</script>
+</body>
+</html>
